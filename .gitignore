@@ -1,0 +1,13 @@
+#Ignore everything in the bin, obj, and .git folders
+"BaseInvariant/Debug"
+"BaseInvariant/Release"
+Debug/
+Release/
+ipch/
+.git/
+
+#Ignore anything ending in .user or .suo
+*.user
+*.suo
+*.sdf
+*.opensdf
