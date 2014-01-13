@@ -55,7 +55,7 @@ public:
 
 		return m_isNegative ? -returnValue : returnValue;
 	}
-	void changeBase(int newBase)
+	void setBase(int newBase)
 	{
 		double asDouble = abs(toDouble());
 		int asInt = (int) floor(asDouble);
@@ -92,7 +92,7 @@ public:
 	{
 		m_data = rhs.m_data;
 
-		changeBase(m_base);
+		setBase(m_base);
 
 		return *this;
 	}
