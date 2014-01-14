@@ -2,7 +2,6 @@
 #include <deque>
 #include <istream>
 #include <ostream>
-#include <functional>
 using namespace std;
 
 #pragma warning(push, 3)
