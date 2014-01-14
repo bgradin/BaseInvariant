@@ -4,6 +4,8 @@
 #include <ostream>
 using namespace std;
 
+#pragma warning(push, 3)
+
 class BaseInvariant
 {
 	unsigned int m_base, m_maximumPrecision, m_decimalPosition;
@@ -185,39 +187,7 @@ public:
 	{
 		return m_data == rhs.m_data && m_base == rhs.m_base && m_isNegative == rhs.m_isNegative;
 	}
-	bool operator==(const short& rhs) const
-	{
-		return toShort() == rhs;
-	}
-	bool operator==(const int& rhs) const
-	{
-		return toInt() == rhs;
-	}
-	bool operator==(const long& rhs) const
-	{
-		return toLong() == rhs;
-	}
-	bool operator==(const double& rhs) const
-	{
-		return toDouble() == rhs;
-	}
 	bool operator!=(const BaseInvariant& rhs) const
-	{
-		return !(*this == rhs);
-	}
-	bool operator!=(const short& rhs) const
-	{
-		return !(*this == rhs);
-	}
-	bool operator!=(const int& rhs) const
-	{
-		return !(*this == rhs);
-	}
-	bool operator!=(const long& rhs) const
-	{
-		return !(*this == rhs);
-	}
-	bool operator!=(const double& rhs) const
 	{
 		return !(*this == rhs);
 	}
@@ -236,119 +206,23 @@ public:
 
 		return *this;
 	}
-	BaseInvariant& operator=(const short& rhs)
-	{
-		return *this = BaseInvariant(rhs);
-	}
-	BaseInvariant& operator=(const int& rhs)
-	{
-		return *this = BaseInvariant(rhs);
-	}
-	BaseInvariant& operator=(const long& rhs)
-	{
-		return *this = BaseInvariant(rhs);
-	}
-	BaseInvariant& operator=(const double& rhs)
-	{
-		return *this = BaseInvariant(rhs);
-	}
 	BaseInvariant operator+(const BaseInvariant& rhs) const
 	{
 		return BaseInvariant(toDouble() + rhs.toDouble(), m_base, m_maximumPrecision);
-	}
-	BaseInvariant operator+(const short& rhs) const
-	{
-		return *this + BaseInvariant(rhs);
-	}
-	BaseInvariant operator+(const int& rhs) const
-	{
-		return *this + BaseInvariant(rhs);
-	}
-	BaseInvariant operator+(const long& rhs) const
-	{
-		return *this + BaseInvariant(rhs);
-	}
-	BaseInvariant operator+(const double& rhs) const
-	{
-		return *this + BaseInvariant(rhs);
 	}
 	BaseInvariant operator-(const BaseInvariant& rhs) const
 	{
 		return BaseInvariant(toDouble() - rhs.toDouble(), m_base, m_maximumPrecision);
 	}
-	BaseInvariant operator-(const short& rhs)
-	{
-		return *this - BaseInvariant(rhs);
-	}
-	BaseInvariant operator-(const int& rhs)
-	{
-		return *this - BaseInvariant(rhs);
-	}
-	BaseInvariant operator-(const long& rhs)
-	{
-		return *this - BaseInvariant(rhs);
-	}
-	BaseInvariant operator-(const double& rhs)
-	{
-		return *this - BaseInvariant(rhs);
-	}
 	BaseInvariant operator*(const BaseInvariant& rhs)
 	{
 		return BaseInvariant(toDouble() * rhs.toDouble(), m_base, m_maximumPrecision);
-	}
-	BaseInvariant operator*(const short& rhs)
-	{
-		return *this * BaseInvariant(rhs);
-	}
-	BaseInvariant operator*(const int& rhs)
-	{
-		return *this * BaseInvariant(rhs);
-	}
-	BaseInvariant operator*(const long& rhs)
-	{
-		return *this * BaseInvariant(rhs);
-	}
-	BaseInvariant operator*(const double& rhs)
-	{
-		return *this * BaseInvariant(rhs);
 	}
 	BaseInvariant operator/(const BaseInvariant& rhs)
 	{
 		return BaseInvariant(toDouble() / rhs.toDouble(), m_base, m_maximumPrecision);
 	}
-	BaseInvariant operator/(const short& rhs)
-	{
-		return *this / BaseInvariant(rhs);
-	}
-	BaseInvariant operator/(const int& rhs)
-	{
-		return *this / BaseInvariant(rhs);
-	}
-	BaseInvariant operator/(const long& rhs)
-	{
-		return *this / BaseInvariant(rhs);
-	}
-	BaseInvariant operator/(const double& rhs)
-	{
-		return *this / BaseInvariant(rhs);
-	}
 	BaseInvariant& operator+=(const BaseInvariant& rhs)
-	{
-		return *this = *this + rhs;
-	}
-	BaseInvariant& operator+=(const short& rhs)
-	{
-		return *this = *this + rhs;
-	}
-	BaseInvariant& operator+=(const int& rhs)
-	{
-		return *this = *this + rhs;
-	}
-	BaseInvariant& operator+=(const long& rhs)
-	{
-		return *this = *this + rhs;
-	}
-	BaseInvariant& operator+=(const double& rhs)
 	{
 		return *this = *this + rhs;
 	}
@@ -356,59 +230,11 @@ public:
 	{
 		return *this = *this - rhs;
 	}
-	BaseInvariant& operator-=(const short& rhs)
-	{
-		return *this = *this - rhs;
-	}
-	BaseInvariant& operator-=(const int& rhs)
-	{
-		return *this = *this - rhs;
-	}
-	BaseInvariant& operator-=(const long& rhs)
-	{
-		return *this = *this - rhs;
-	}
-	BaseInvariant& operator-=(const double& rhs)
-	{
-		return *this = *this - rhs;
-	}
 	BaseInvariant& operator*=(const BaseInvariant& rhs)
 	{
 		return *this = *this * rhs;
 	}
-	BaseInvariant& operator*=(const short& rhs)
-	{
-		return *this = *this * rhs;
-	}
-	BaseInvariant& operator*=(const int& rhs)
-	{
-		return *this = *this * rhs;
-	}
-	BaseInvariant& operator*=(const long& rhs)
-	{
-		return *this = *this * rhs;
-	}
-	BaseInvariant& operator*=(const double& rhs)
-	{
-		return *this = *this * rhs;
-	}
 	BaseInvariant& operator/=(const BaseInvariant& rhs)
-	{
-		return *this = *this / rhs;
-	}
-	BaseInvariant& operator/=(const short& rhs)
-	{
-		return *this = *this / rhs;
-	}
-	BaseInvariant& operator/=(const int& rhs)
-	{
-		return *this = *this / rhs;
-	}
-	BaseInvariant& operator/=(const long& rhs)
-	{
-		return *this = *this / rhs;
-	}
-	BaseInvariant& operator/=(const double& rhs)
 	{
 		return *this = *this / rhs;
 	}
@@ -434,3 +260,5 @@ public:
 		return outputStream;
 	}
 };
+
+#pragma warning(pop)
