@@ -5,7 +5,7 @@
 using namespace std;
 
 #pragma warning(push, 3)
-#define STANDARD_TEMPLATE template<typename T>
+#define TEMPLATE template<typename T>
 #define DEFAULT_BASE 10
 #define DEFAULT_PRECISION 15
 #define base2(a) BaseInvariant(a, 2)
@@ -37,20 +37,20 @@ class BaseInvariant
 	deque<int> m_data;
 	bool m_isNegative;
 
-	STANDARD_TEMPLATE static T add(T a, T b) { return a + b; }
-	STANDARD_TEMPLATE static T subtract(T a, T b) { return a - b; }
-	STANDARD_TEMPLATE static T multiply(T a, T b) { return a * b; }
-	STANDARD_TEMPLATE static T divide(T a, T b) { return a / b; }
+	TEMPLATE static T add(T a, T b) { return a + b; }
+	TEMPLATE static T subtract(T a, T b) { return a - b; }
+	TEMPLATE static T multiply(T a, T b) { return a * b; }
+	TEMPLATE static T divide(T a, T b) { return a / b; }
 
-	STANDARD_TEMPLATE BaseInvariant perform(T (*operation)(T, T), const BaseInvariant& rhs) const
+	TEMPLATE BaseInvariant perform(T (*operation)(T, T), const BaseInvariant& rhs) const
 	{
 		return BaseInvariant(operation((T) *this, (T) rhs), m_base, m_maximumPrecision);
 	}
-	STANDARD_TEMPLATE BaseInvariant& perform_assign(T (*operation)(T, T), const BaseInvariant& rhs)
+	TEMPLATE BaseInvariant& perform_assign(T (*operation)(T, T), const BaseInvariant& rhs)
 	{
 		return *this = operation((T) *this, (T) rhs);
 	}
-	STANDARD_TEMPLATE T cast(bool hasDecimals = false) const
+	TEMPLATE T cast(bool hasDecimals = false) const
 	{
 		T returnValue = 0;
 
@@ -59,7 +59,7 @@ class BaseInvariant
 
 		return m_isNegative ? -returnValue : returnValue;
 	}
-	STANDARD_TEMPLATE void construct(T value, int base, int precision)
+	TEMPLATE void construct(T value, int base, int precision)
 	{
 		m_base = base;
 		m_maximumPrecision = precision;
