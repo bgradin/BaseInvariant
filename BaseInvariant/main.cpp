@@ -8,7 +8,11 @@ void main()
 	BaseInvariant test1 = 100;
 	BaseInvariant test2 = base2(10.25);
 	BaseInvariant test3 = baseN(-234, 31);
-	BaseInvariant test4(10.0 / 3, 10, 2);
+	BaseInvariant test4(10.0 / 3, 10, 7);
+
+	// Modify precision or base
+	test4.setPrecision(4);
+	test4.setBase(4);
 
 	// Perform mathematical operations on numbers of different bases and/or data types
 	test1 += test2;
@@ -21,9 +25,15 @@ void main()
 	//   Otherwise, it's impossible to tell where one digit ends and the next begins
 	cout << "test1(int)           = " << (int) test1 << endl;
 	cout << "test1(double)        = " << (double) test1 << endl;
-	cout << "test2                = " << test2 << endl;
-	cout << "test3                = " << test3 << endl;
+	cout << endl;
+	cout << "test2 (base " << test2.getBase() << ")       = " << test2 << endl;
+	cout << endl;
+	cout << "test3 (base " << test3.getBase() << ")      = " << test3 << endl;
+	cout << "test3 (base 10)      = " << (double) test3 << endl;
 	cout << "test3 - 13 (base " << test3.getBase() << ") = " << test3 - 13 << endl;
 	cout << "test3 - 13 (base 10) = " << (double) test3 - 13 << endl;
-	cout << "test4                = " << test4 << endl;
+	cout << endl;
+	cout << "test4 (base " << test4.getBase() << ")       = " << test4 << endl;
+	cout << "test4 (base 10)      = " << (double) test4 << endl;
+	cout << endl;
 }
