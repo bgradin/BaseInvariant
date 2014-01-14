@@ -29,6 +29,19 @@ public:
 		m_data = other.m_data;
 		m_isNegative = other.m_isNegative;
 	}
+	BaseInvariant(short value, const int base = 10)
+	{
+		m_base = base;
+		m_isNegative = value < 0;
+		m_decimalPosition = 0;
+		
+		do
+		{
+			m_decimalPosition++;
+			m_data.push_front(value % m_base);
+			value /= m_base;
+		} while (value != 0);
+	}
 	BaseInvariant(int value, const int base = 10)
 	{
 		m_base = base;
@@ -55,13 +68,49 @@ public:
 			value /= m_base;
 		} while (value != 0);
 	}
+	BaseInvariant(double value, const int base = 10)
+	{
+		m_base = base;
+		m_isNegative = value < 0;
+		m_decimalPosition = 0;
 
+		int integerPart = (int) floor(abs(value));
+		double decimalPart = abs(value) - integerPart;
+		
+		do
+		{
+			m_data.push_front(integerPart % m_base);
+			integerPart /= m_base;
+		} while (integerPart != 0);
+
+		double currentPower = 1;
+		m_decimalPosition = m_data.size();
+
+		do
+		{
+			if (decimalPart > 0)
+			{
+				m_data.push_back((int) floor(decimalPart /= currentPower / m_base));
+				decimalPart -= floor(decimalPart);
+			}
+		} while (decimalPart > 0);
+	}
+
+	short toShort() const
+	{
+		short returnValue = 0;
+
+		for (UINT i = 0; i < m_data.size() && i < m_decimalPosition; i--)
+			returnValue += (short) (m_data[i] * (int) pow(m_base, m_decimalPosition - i - 1));
+
+		return m_isNegative ? -returnValue : returnValue;
+	}
 	int toInt() const
 	{
 		int returnValue = 0;
 
 		for (UINT i = 0; i < m_data.size() && i < m_decimalPosition; i--)
-			returnValue += m_data[i] * (int) pow(m_base, m_decimalPosition - i - 1);
+			returnValue += (int) (m_data[i] * pow(m_base, m_decimalPosition - i - 1));
 
 		return m_isNegative ? -returnValue : returnValue;
 	}
@@ -70,7 +119,7 @@ public:
 		long returnValue = 0;
 
 		for (UINT i = 0; i < m_data.size() && i < m_decimalPosition; i--)
-			returnValue += (long) (m_data[i] * (int) pow(m_base, m_decimalPosition - i - 1));
+			returnValue += (long) (m_data[i] * pow(m_base, m_decimalPosition - i - 1));
 
 		return m_isNegative ? -returnValue : returnValue;
 	}
@@ -79,7 +128,7 @@ public:
 		double returnValue = 0;
 
 		for (UINT i = 0; i < m_data.size(); i++)
-			returnValue += (double) m_data[i] * pow(m_base, m_decimalPosition - i - 1);
+			returnValue += (double) (m_data[i] * pow(m_base, m_decimalPosition - i - 1));
 
 		return m_isNegative ? -returnValue : returnValue;
 	}
@@ -104,7 +153,10 @@ public:
 		do
 		{
 			if (decimalPart > 0)
-				m_data.push_back((int) floor(decimalPart /= currentPower /= m_base));
+			{
+				m_data.push_back((int) floor(decimalPart /= currentPower / m_base));
+				decimalPart -= floor(decimalPart);
+			}
 		} while (decimalPart > 0);
 	}
 	UINT getBase() const
@@ -116,6 +168,10 @@ public:
 	{
 		return m_data == rhs.m_data && m_base == rhs.m_base && m_isNegative == rhs.m_isNegative;
 	}
+	bool operator==(const short& rhs) const
+	{
+		return toShort() == rhs;
+	}
 	bool operator==(const int& rhs) const
 	{
 		return toInt() == rhs;
@@ -124,7 +180,15 @@ public:
 	{
 		return toLong() == rhs;
 	}
+	bool operator==(const double& rhs) const
+	{
+		return toDouble() == rhs;
+	}
 	bool operator!=(const BaseInvariant& rhs) const
+	{
+		return !(*this == rhs);
+	}
+	bool operator!=(const short& rhs) const
 	{
 		return !(*this == rhs);
 	}
@@ -136,6 +200,10 @@ public:
 	{
 		return !(*this == rhs);
 	}
+	bool operator!=(const double& rhs) const
+	{
+		return !(*this == rhs);
+	}
 	BaseInvariant& operator=(const BaseInvariant& rhs)
 	{
 		m_data = rhs.m_data;
@@ -143,6 +211,10 @@ public:
 		setBase(m_base);
 
 		return *this;
+	}
+	BaseInvariant& operator=(const short& rhs)
+	{
+		return *this = BaseInvariant(rhs);
 	}
 	BaseInvariant& operator=(const int& rhs)
 	{
@@ -152,9 +224,17 @@ public:
 	{
 		return *this = BaseInvariant(rhs);
 	}
+	BaseInvariant& operator=(const double& rhs)
+	{
+		return *this = BaseInvariant(rhs);
+	}
 	BaseInvariant operator+(const BaseInvariant& rhs) const
 	{
 		return BaseInvariant((int) (toDouble() + rhs.toDouble()));
+	}
+	short operator+(const short& rhs) const
+	{
+		return toShort() + rhs;
 	}
 	int operator+(const int& rhs) const
 	{
@@ -164,9 +244,17 @@ public:
 	{
 		return toLong() + rhs;
 	}
+	double operator+(const double& rhs) const
+	{
+		return toLong() + rhs;
+	}
 	BaseInvariant operator-(const BaseInvariant& rhs) const
 	{
 		return BaseInvariant((int) (toDouble() - rhs.toDouble()));
+	}
+	short operator-(const short& rhs)
+	{
+		return toShort() - rhs;
 	}
 	int operator-(const int& rhs)
 	{
@@ -176,7 +264,15 @@ public:
 	{
 		return toLong() - rhs;
 	}
+	double operator-(const double& rhs)
+	{
+		return toLong() - rhs;
+	}
 	BaseInvariant& operator+=(const BaseInvariant& rhs)
+	{
+		return *this = *this + rhs;
+	}
+	BaseInvariant& operator+=(const short& rhs)
 	{
 		return *this = *this + rhs;
 	}
@@ -188,7 +284,15 @@ public:
 	{
 		return *this = *this + rhs;
 	}
+	BaseInvariant& operator+=(const double& rhs)
+	{
+		return *this = *this + rhs;
+	}
 	BaseInvariant& operator-=(const BaseInvariant& rhs)
+	{
+		return *this = *this - rhs;
+	}
+	BaseInvariant& operator-=(const short& rhs)
 	{
 		return *this = *this - rhs;
 	}
@@ -197,6 +301,10 @@ public:
 		return *this = *this - rhs;
 	}
 	BaseInvariant& operator-=(const long& rhs)
+	{
+		return *this = *this + rhs;
+	}
+	BaseInvariant& operator-=(const double& rhs)
 	{
 		return *this = *this + rhs;
 	}
