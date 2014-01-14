@@ -42,6 +42,19 @@ public:
 			value /= m_base;
 		} while (value != 0);
 	}
+	BaseInvariant(long value, const int base = 10)
+	{
+		m_base = base;
+		m_isNegative = value < 0;
+		m_decimalPosition = 0;
+		
+		do
+		{
+			m_decimalPosition++;
+			m_data.push_front(value % m_base);
+			value /= m_base;
+		} while (value != 0);
+	}
 
 	int toInt() const
 	{
@@ -49,6 +62,15 @@ public:
 
 		for (UINT i = 0; i < m_data.size() && i < m_decimalPosition; i--)
 			returnValue += m_data[i] * (int) pow(m_base, m_decimalPosition - i - 1);
+
+		return m_isNegative ? -returnValue : returnValue;
+	}
+	long toLong() const
+	{
+		long returnValue = 0;
+
+		for (UINT i = 0; i < m_data.size() && i < m_decimalPosition; i--)
+			returnValue += (long) (m_data[i] * (int) pow(m_base, m_decimalPosition - i - 1));
 
 		return m_isNegative ? -returnValue : returnValue;
 	}
@@ -94,7 +116,23 @@ public:
 	{
 		return m_data == rhs.m_data && m_base == rhs.m_base && m_isNegative == rhs.m_isNegative;
 	}
+	bool operator==(const int& rhs) const
+	{
+		return toInt() == rhs;
+	}
+	bool operator==(const long& rhs) const
+	{
+		return toLong() == rhs;
+	}
 	bool operator!=(const BaseInvariant& rhs) const
+	{
+		return !(*this == rhs);
+	}
+	bool operator!=(const int& rhs) const
+	{
+		return !(*this == rhs);
+	}
+	bool operator!=(const long& rhs) const
 	{
 		return !(*this == rhs);
 	}
@@ -106,21 +144,61 @@ public:
 
 		return *this;
 	}
+	BaseInvariant& operator=(const int& rhs)
+	{
+		return *this = BaseInvariant(rhs);
+	}
+	BaseInvariant& operator=(const long& rhs)
+	{
+		return *this = BaseInvariant(rhs);
+	}
 	BaseInvariant operator+(const BaseInvariant& rhs) const
 	{
 		return BaseInvariant((int) (toDouble() + rhs.toDouble()));
+	}
+	int operator+(const int& rhs) const
+	{
+		return toInt() + rhs;
+	}
+	long operator+(const long& rhs) const
+	{
+		return toLong() + rhs;
 	}
 	BaseInvariant operator-(const BaseInvariant& rhs) const
 	{
 		return BaseInvariant((int) (toDouble() - rhs.toDouble()));
 	}
+	int operator-(const int& rhs)
+	{
+		return toInt() - rhs;
+	}
+	long operator-(const long& rhs)
+	{
+		return toLong() - rhs;
+	}
 	BaseInvariant& operator+=(const BaseInvariant& rhs)
+	{
+		return *this = *this + rhs;
+	}
+	BaseInvariant& operator+=(const int& rhs)
+	{
+		return *this = *this + rhs;
+	}
+	BaseInvariant& operator+=(const long& rhs)
 	{
 		return *this = *this + rhs;
 	}
 	BaseInvariant& operator-=(const BaseInvariant& rhs)
 	{
 		return *this = *this - rhs;
+	}
+	BaseInvariant& operator-=(const int& rhs)
+	{
+		return *this = *this - rhs;
+	}
+	BaseInvariant& operator-=(const long& rhs)
+	{
+		return *this = *this + rhs;
 	}
 	friend istream& operator>>(istream& inputStream, BaseInvariant& instance)
 	{
