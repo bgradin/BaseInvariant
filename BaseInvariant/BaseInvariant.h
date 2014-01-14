@@ -4,13 +4,9 @@
 #include <ostream>
 using namespace std;
 
-#ifndef UINT
-typedef unsigned int UINT;
-#endif
-
 class BaseInvariant
 {
-	UINT m_base, m_decimalPosition;
+	int m_base, m_decimalPosition;
 	deque<int> m_data;
 	bool m_isNegative;
 
@@ -35,6 +31,8 @@ public:
 		m_isNegative = value < 0;
 		m_decimalPosition = 0;
 		
+		value = abs(value);
+
 		do
 		{
 			m_decimalPosition++;
@@ -47,6 +45,8 @@ public:
 		m_base = base;
 		m_isNegative = value < 0;
 		m_decimalPosition = 0;
+
+		value = abs(value);
 		
 		do
 		{
@@ -61,6 +61,8 @@ public:
 		m_isNegative = value < 0;
 		m_decimalPosition = 0;
 		
+		value = abs(value);
+
 		do
 		{
 			m_decimalPosition++;
@@ -76,31 +78,28 @@ public:
 
 		int integerPart = (int) floor(abs(value));
 		double decimalPart = abs(value) - integerPart;
-		
-		do
-		{
-			m_data.push_front(integerPart % m_base);
-			integerPart /= m_base;
-		} while (integerPart != 0);
-
-		double currentPower = 1;
-		m_decimalPosition = m_data.size();
 
 		do
 		{
+			if (integerPart != 0)
+			{
+				m_data.push_front(integerPart % m_base);
+				integerPart /= m_base;
+				m_decimalPosition++;
+			}
 			if (decimalPart > 0)
 			{
-				m_data.push_back((int) floor(decimalPart /= currentPower / m_base));
+				m_data.push_back((int) floor(decimalPart /= 1.0 / m_base));
 				decimalPart -= floor(decimalPart);
 			}
-		} while (decimalPart > 0);
+		} while (decimalPart > 0 || integerPart != 0);
 	}
 
 	short toShort() const
 	{
 		short returnValue = 0;
 
-		for (UINT i = 0; i < m_data.size() && i < m_decimalPosition; i--)
+		for (int i = 0; i < (int) m_data.size() && i < m_decimalPosition; i++)
 			returnValue += (short) (m_data[i] * (int) pow(m_base, m_decimalPosition - i - 1));
 
 		return m_isNegative ? -returnValue : returnValue;
@@ -109,7 +108,7 @@ public:
 	{
 		int returnValue = 0;
 
-		for (UINT i = 0; i < m_data.size() && i < m_decimalPosition; i--)
+		for (int i = 0; i < (int) m_data.size() && i < m_decimalPosition; i++)
 			returnValue += (int) (m_data[i] * pow(m_base, m_decimalPosition - i - 1));
 
 		return m_isNegative ? -returnValue : returnValue;
@@ -118,7 +117,7 @@ public:
 	{
 		long returnValue = 0;
 
-		for (UINT i = 0; i < m_data.size() && i < m_decimalPosition; i--)
+		for (int i = 0; i < (int) m_data.size() && i < m_decimalPosition; i++)
 			returnValue += (long) (m_data[i] * pow(m_base, m_decimalPosition - i - 1));
 
 		return m_isNegative ? -returnValue : returnValue;
@@ -127,8 +126,8 @@ public:
 	{
 		double returnValue = 0;
 
-		for (UINT i = 0; i < m_data.size(); i++)
-			returnValue += (double) (m_data[i] * pow(m_base, m_decimalPosition - i - 1));
+		for (int i = 0; i < (int) m_data.size(); i++)
+			returnValue += ((double) m_data[i]) * pow(m_base, m_decimalPosition - i - 1);
 
 		return m_isNegative ? -returnValue : returnValue;
 	}
@@ -140,26 +139,24 @@ public:
 
 		m_data.clear();
 		m_base = newBase;
+		m_decimalPosition = 0;
 
 		do
 		{
-			m_data.push_front(asInt % m_base);
-			asInt /= m_base;
-		} while (asInt != 0);
-
-		double currentPower = 1.0 / m_base;
-		m_decimalPosition = m_data.size();
-
-		do
-		{
+			if (asInt != 0)
+			{
+				m_data.push_front(asInt % m_base);
+				asInt /= m_base;
+				m_decimalPosition++;
+			}
 			if (decimalPart > 0)
 			{
-				m_data.push_back((int) floor(decimalPart /= currentPower / m_base));
+				m_data.push_back((int) floor(decimalPart /= 1.0 / m_base));
 				decimalPart -= floor(decimalPart);
 			}
-		} while (decimalPart > 0);
+		} while (decimalPart > 0 || asInt != 0);
 	}
-	UINT getBase() const
+	unsigned int getBase() const
 	{
 		return m_base;
 	}
@@ -230,43 +227,43 @@ public:
 	}
 	BaseInvariant operator+(const BaseInvariant& rhs) const
 	{
-		return BaseInvariant((int) (toDouble() + rhs.toDouble()));
+		return BaseInvariant(toDouble() + rhs.toDouble());
 	}
-	short operator+(const short& rhs) const
+	BaseInvariant operator+(const short& rhs) const
 	{
-		return toShort() + rhs;
+		return *this + BaseInvariant(rhs);
 	}
-	int operator+(const int& rhs) const
+	BaseInvariant operator+(const int& rhs) const
 	{
-		return toInt() + rhs;
+		return *this + BaseInvariant(rhs);
 	}
-	long operator+(const long& rhs) const
+	BaseInvariant operator+(const long& rhs) const
 	{
-		return toLong() + rhs;
+		return *this + BaseInvariant(rhs);
 	}
-	double operator+(const double& rhs) const
+	BaseInvariant operator+(const double& rhs) const
 	{
-		return toLong() + rhs;
+		return *this + BaseInvariant(rhs);
 	}
 	BaseInvariant operator-(const BaseInvariant& rhs) const
 	{
-		return BaseInvariant((int) (toDouble() - rhs.toDouble()));
+		return BaseInvariant(toDouble() - rhs.toDouble());
 	}
-	short operator-(const short& rhs)
+	BaseInvariant operator-(const short& rhs)
 	{
-		return toShort() - rhs;
+		return *this - BaseInvariant(rhs);
 	}
-	int operator-(const int& rhs)
+	BaseInvariant operator-(const int& rhs)
 	{
-		return toInt() - rhs;
+		return *this - BaseInvariant(rhs);
 	}
-	long operator-(const long& rhs)
+	BaseInvariant operator-(const long& rhs)
 	{
-		return toLong() - rhs;
+		return *this - BaseInvariant(rhs);
 	}
-	double operator-(const double& rhs)
+	BaseInvariant operator-(const double& rhs)
 	{
-		return toLong() - rhs;
+		return *this - BaseInvariant(rhs);
 	}
 	BaseInvariant& operator+=(const BaseInvariant& rhs)
 	{
@@ -302,11 +299,11 @@ public:
 	}
 	BaseInvariant& operator-=(const long& rhs)
 	{
-		return *this = *this + rhs;
+		return *this = *this - rhs;
 	}
 	BaseInvariant& operator-=(const double& rhs)
 	{
-		return *this = *this + rhs;
+		return *this = *this - rhs;
 	}
 	friend istream& operator>>(istream& inputStream, BaseInvariant& instance)
 	{
@@ -319,10 +316,13 @@ public:
 	}
 	friend ostream& operator<<(ostream& outputStream, const BaseInvariant& instance)
 	{
+		if (instance.m_isNegative)
+			outputStream << "- ";
+
 		outputStream << instance.m_data[0];
 
-		for (UINT i = 1; i < instance.m_data.size(); i++)
-			outputStream << " " << instance.m_data[i];
+		for (unsigned int i = 1; i < instance.m_data.size(); i++)
+			outputStream << (i == instance.m_decimalPosition ? " . " : " ") << instance.m_data[i];
 
 		return outputStream;
 	}
