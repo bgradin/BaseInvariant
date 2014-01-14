@@ -123,10 +123,14 @@ public:
 	{
 		m_maximumPrecision = newPrecision;
 
-		for (UINT i = 0; i < newPrecision - (m_data.size() - m_decimalPosition); i++)
+		// If newPrecision > currentPrecision
+		int add = (int) m_maximumPrecision - ((int) m_data.size() - (int) m_decimalPosition);
+		for (int i = 0; i < add; i++)
 			m_data.push_back(0);
 
-		for (UINT i = 0; i < (m_data.size() - m_decimalPosition) - newPrecision; i++)
+		// If newPrecision < currentPrecision
+		int remove = ((int) m_data.size() - (int) m_decimalPosition) - (int) m_maximumPrecision;
+		for (int i = 0; i < remove; i++)
 			m_data.pop_back();
 	}
 	UINT getPrecision() const
