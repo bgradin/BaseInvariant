@@ -9,6 +9,10 @@ using namespace std;
 #define STANDARD_BASE 10
 #define STANDARD_PRECISION 15
 
+#ifndef UINT
+typedef unsigned int UINT;
+#endif
+
 #define base2(a) BaseInvariant(a, 2)
 #define base16(a) BaseInvariant(a, 16)
 #define baseN(a, n) BaseInvariant(a, n)
@@ -85,27 +89,31 @@ class BaseInvariant
 			}
 		} while ((decimalPart > 0 && m_data.size() <= m_maximumPrecision) || integerPart != 0);
 	}
+	void construct(const BaseInvariant& other)
+	{
+		construct(other.m_base, other.m_maximumPrecision, other.m_decimalPosition, other.m_data, other.m_isNegative);
+	}
+	void construct(UINT base, UINT maximumPrecision, UINT decimalPosition, deque<int> data, bool isNegative)
+	{
+		m_base = base;
+		m_maximumPrecision = maximumPrecision;
+		m_decimalPosition = decimalPosition;
+		m_data = data;
+		m_isNegative = isNegative;
+	}
 
-	unsigned int m_base, m_maximumPrecision, m_decimalPosition;
+	UINT m_base, m_maximumPrecision, m_decimalPosition;
 	deque<int> m_data;
 	bool m_isNegative;
 
 public:
 	BaseInvariant()
 	{
-		m_base = STANDARD_BASE;
-		m_maximumPrecision = STANDARD_PRECISION;
-		m_decimalPosition = 1;
-		m_data.push_back(0);
-		m_isNegative = false;
+		construct(STANDARD_BASE, STANDARD_PRECISION, 1, deque<int>(1, 0), false);
 	}
 	BaseInvariant(const BaseInvariant& other)
 	{
-		m_base = other.m_base;
-		m_maximumPrecision = other.m_maximumPrecision;
-		m_decimalPosition = other.m_decimalPosition;
-		m_data = other.m_data;
-		m_isNegative = other.m_isNegative;
+		construct(other);
 	}
 	COPY_CONSTRUCTOR(short);
 	COPY_CONSTRUCTOR(int);
@@ -116,7 +124,7 @@ public:
 	{
 		construct<double>((double) *this, newBase, m_maximumPrecision);
 	}
-	unsigned int getBase() const
+	UINT getBase() const
 	{
 		return m_base;
 	}
@@ -124,13 +132,13 @@ public:
 	{
 		m_maximumPrecision = newPrecision;
 
-		for (unsigned int i = 0; i < newPrecision - (m_data.size() - m_decimalPosition); i++)
+		for (UINT i = 0; i < newPrecision - (m_data.size() - m_decimalPosition); i++)
 			m_data.push_back(0);
 
-		for (unsigned int i = 0; i < (m_data.size() - m_decimalPosition) - newPrecision; i++)
+		for (UINT i = 0; i < (m_data.size() - m_decimalPosition) - newPrecision; i++)
 			m_data.pop_back();
 	}
-	unsigned int getPrecision() const
+	UINT getPrecision() const
 	{
 		return m_maximumPrecision;
 	}
@@ -155,13 +163,9 @@ public:
 	// Math/assignment
 	BaseInvariant& operator=(const BaseInvariant& rhs)
 	{
-		unsigned int baseBackup = m_base;
+		UINT baseBackup = m_base;
 
-		m_base = rhs.m_base;
-		m_data = rhs.m_data;
-		m_isNegative = rhs.m_isNegative;
-		m_maximumPrecision = rhs.m_maximumPrecision;
-		m_decimalPosition = rhs.m_decimalPosition;
+		construct(rhs.m_base, rhs.m_maximumPrecision, rhs.m_decimalPosition, rhs.m_data, rhs.m_isNegative);
 
 		if (m_base != baseBackup)
 			setBase(baseBackup);
@@ -194,7 +198,7 @@ public:
 
 		outputStream << instance.m_data[0];
 
-		for (unsigned int i = 1; i < instance.m_data.size(); i++)
+		for (UINT i = 1; i < instance.m_data.size(); i++)
 			outputStream << (i == instance.m_decimalPosition ? " . " : " ") << instance.m_data[i];
 
 		return outputStream;
