@@ -9,6 +9,7 @@ using namespace std;
 #define DEFAULT_BASE 10
 #define DEFAULT_PRECISION 15
 #define base2(a) BaseInvariant(a, 2)
+#define base10(a) BaseInvariant(a, 10)
 #define base16(a) BaseInvariant(a, 16)
 
 #define OPERATORS(type, operatorName, operationName, operation) \
