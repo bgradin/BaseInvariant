@@ -29,7 +29,7 @@ public:
 		m_data = other.m_data;
 		m_isNegative = other.m_isNegative;
 	}
-	BaseInvariant(int value, int base = 10)
+	BaseInvariant(int value, const int base = 10)
 	{
 		m_base = base;
 		m_isNegative = value < 0;
@@ -43,7 +43,7 @@ public:
 		} while (value != 0);
 	}
 
-	int toInt()
+	int toInt() const
 	{
 		int returnValue = 0;
 
@@ -52,7 +52,7 @@ public:
 
 		return m_isNegative ? -returnValue : returnValue;
 	}
-	double toDouble()
+	double toDouble() const
 	{
 		double returnValue = 0;
 
@@ -61,7 +61,7 @@ public:
 
 		return m_isNegative ? -returnValue : returnValue;
 	}
-	void setBase(int newBase)
+	void setBase(const int newBase)
 	{
 		double asDouble = abs(toDouble());
 		int asInt = (int) floor(asDouble);
@@ -85,20 +85,20 @@ public:
 				m_data.push_back((int) floor(decimalPart /= currentPower /= m_base));
 		} while (decimalPart > 0);
 	}
-	UINT getBase()
+	UINT getBase() const
 	{
 		return m_base;
 	}
 
-	bool operator==(BaseInvariant& rhs)
+	bool operator==(const BaseInvariant& rhs) const
 	{
 		return m_data == rhs.m_data && m_base == rhs.m_base && m_isNegative == rhs.m_isNegative;
 	}
-	bool operator!=(BaseInvariant& rhs)
+	bool operator!=(const BaseInvariant& rhs) const
 	{
 		return !(*this == rhs);
 	}
-	BaseInvariant& operator=(BaseInvariant& rhs)
+	BaseInvariant& operator=(const BaseInvariant& rhs)
 	{
 		m_data = rhs.m_data;
 
@@ -106,19 +106,19 @@ public:
 
 		return *this;
 	}
-	BaseInvariant operator+(BaseInvariant& rhs)
+	BaseInvariant operator+(const BaseInvariant& rhs) const
 	{
 		return BaseInvariant((int) (toDouble() + rhs.toDouble()));
 	}
-	BaseInvariant operator-(BaseInvariant& rhs)
+	BaseInvariant operator-(const BaseInvariant& rhs) const
 	{
 		return BaseInvariant((int) (toDouble() - rhs.toDouble()));
 	}
-	BaseInvariant& operator+=(BaseInvariant& rhs)
+	BaseInvariant& operator+=(const BaseInvariant& rhs)
 	{
 		return *this = *this + rhs;
 	}
-	BaseInvariant& operator-=(BaseInvariant& rhs)
+	BaseInvariant& operator-=(const BaseInvariant& rhs)
 	{
 		return *this = *this - rhs;
 	}
