@@ -5,6 +5,10 @@
 using namespace std;
 
 #pragma warning(push, 3)
+#define STANDARD_TEMPLATE template<typename T>
+#define DEFAULT_BASE 10
+#define DEFAULT_PRECISION 15
+#define base10(a) BaseInvariant(a, 10)
 
 class BaseInvariant
 {
@@ -12,77 +16,35 @@ class BaseInvariant
 	deque<int> m_data;
 	bool m_isNegative;
 
-public:
-	BaseInvariant()
-	{
-		m_base = 10;
-		m_maximumPrecision = 15;
-		m_decimalPosition = 1;
-		m_data.push_back(0);
-		m_isNegative = false;
-	}
-	BaseInvariant(const BaseInvariant& other)
-	{
-		m_base = other.m_base;
-		m_maximumPrecision = other.m_maximumPrecision;
-		m_decimalPosition = other.m_decimalPosition;
-		m_data = other.m_data;
-		m_isNegative = other.m_isNegative;
-	}
-	BaseInvariant(short value, const int base = 10, const int precision = 15)
-	{
-		m_base = base;
-		m_maximumPrecision = precision;
-		m_isNegative = value < 0;
-		m_decimalPosition = 0;
-		
-		value = abs(value);
+	STANDARD_TEMPLATE static T add(T a, T b) { return a + b; }
+	STANDARD_TEMPLATE static T subtract(T a, T b) { return a - b; }
+	STANDARD_TEMPLATE static T multiply(T a, T b) { return a * b; }
+	STANDARD_TEMPLATE static T divide(T a, T b) { return a / b; }
 
-		do
-		{
-			m_decimalPosition++;
-			m_data.push_front(value % m_base);
-			value /= m_base;
-		} while (value != 0);
-	}
-	BaseInvariant(int value, const int base = 10, const int precision = 15)
+	STANDARD_TEMPLATE BaseInvariant perform(T (*operation)(T, T), const BaseInvariant& rhs) const
 	{
-		m_base = base;
-		m_maximumPrecision = precision;
-		m_isNegative = value < 0;
-		m_decimalPosition = 0;
+		return BaseInvariant(operation((T) *this, (T) rhs), m_base, m_maximumPrecision);
+	}
+	STANDARD_TEMPLATE BaseInvariant& perform_assign(T (*operation)(T, T), const BaseInvariant& rhs)
+	{
+		return *this = operation((T) *this, (T) rhs);
+	}
+	STANDARD_TEMPLATE T cast(bool hasDecimals = false) const
+	{
+		T returnValue = 0;
 
-		value = abs(value);
-		
-		do
-		{
-			m_decimalPosition++;
-			m_data.push_front(value % m_base);
-			value /= m_base;
-		} while (value != 0);
-	}
-	BaseInvariant(long value, const int base = 10, const int precision = 15)
-	{
-		m_base = base;
-		m_maximumPrecision = precision;
-		m_isNegative = value < 0;
-		m_decimalPosition = 0;
-		
-		value = abs(value);
+		for (int i = 0; i < (int) m_data.size() && (hasDecimals ? true : i < (int) m_decimalPosition); i++)
+			returnValue += (T) m_data[i] * (T) pow(m_base, (int) m_decimalPosition - i - 1);
 
-		do
-		{
-			m_decimalPosition++;
-			m_data.push_front(value % m_base);
-			value /= m_base;
-		} while (value != 0);
+		return m_isNegative ? -returnValue : returnValue;
 	}
-	BaseInvariant(double value, const int base = 10, const int precision = 15)
+	STANDARD_TEMPLATE void construct(T value, int base, int precision)
 	{
 		m_base = base;
 		m_maximumPrecision = precision;
 		m_isNegative = value < 0;
 		m_decimalPosition = 0;
+		m_data.clear();
 
 		int integerPart = (int) floor(abs(value));
 		double decimalPart = abs(value) - integerPart;
@@ -103,66 +65,43 @@ public:
 		} while ((decimalPart > 0 && m_data.size() <= m_maximumPrecision) || integerPart != 0);
 	}
 
-	short toShort() const
+public:
+	BaseInvariant()
 	{
-		short returnValue = 0;
-
-		for (int i = 0; i < (int) m_data.size() && i < (int) m_decimalPosition; i++)
-			returnValue += (short) (m_data[i] * (int) pow(m_base, (int) m_decimalPosition - i - 1));
-
-		return m_isNegative ? -returnValue : returnValue;
+		m_base = DEFAULT_BASE;
+		m_maximumPrecision = DEFAULT_PRECISION;
+		m_decimalPosition = 1;
+		m_data.push_back(0);
+		m_isNegative = false;
 	}
-	int toInt() const
+	BaseInvariant(const BaseInvariant& other)
 	{
-		int returnValue = 0;
-
-		for (int i = 0; i < (int) m_data.size() && i < (int) m_decimalPosition; i++)
-			returnValue += (int) (m_data[i] * pow(m_base, (int) m_decimalPosition - i - 1));
-
-		return m_isNegative ? -returnValue : returnValue;
+		m_base = other.m_base;
+		m_maximumPrecision = other.m_maximumPrecision;
+		m_decimalPosition = other.m_decimalPosition;
+		m_data = other.m_data;
+		m_isNegative = other.m_isNegative;
 	}
-	long toLong() const
+	BaseInvariant(short value, const int base = DEFAULT_BASE, const int precision = DEFAULT_PRECISION)
 	{
-		long returnValue = 0;
-
-		for (int i = 0; i < (int) m_data.size() && i < (int) m_decimalPosition; i++)
-			returnValue += (long) (m_data[i] * pow(m_base, (int) m_decimalPosition - i - 1));
-
-		return m_isNegative ? -returnValue : returnValue;
+		construct<short>(value, base, precision);
 	}
-	double toDouble() const
+	BaseInvariant(int value, const int base = DEFAULT_BASE, const int precision = DEFAULT_PRECISION)
 	{
-		double returnValue = 0;
-
-		for (int i = 0; i < (int) m_data.size(); i++)
-			returnValue += ((double) m_data[i]) * pow(m_base, (int) m_decimalPosition - i - 1);
-
-		return m_isNegative ? -returnValue : returnValue;
+		construct<int>(value, base, precision);
 	}
+	BaseInvariant(long value, const int base = DEFAULT_BASE, const int precision = DEFAULT_PRECISION)
+	{
+		construct<long>(value, base, precision);
+	}
+	BaseInvariant(double value, const int base = DEFAULT_BASE, const int precision = DEFAULT_PRECISION)
+	{
+		construct<double>(value, base, precision);
+	}
+
 	void setBase(const int newBase)
 	{
-		double asDouble = abs(toDouble());
-		int asInt = (int) floor(asDouble);
-		double decimalPart = asDouble - (double) asInt;
-
-		m_data.clear();
-		m_base = newBase;
-		m_decimalPosition = 0;
-
-		do
-		{
-			if (asInt != 0)
-			{
-				m_data.push_front(asInt % m_base);
-				asInt /= m_base;
-				m_decimalPosition++;
-			}
-			if (decimalPart > 0 && m_data.size() <= m_maximumPrecision)
-			{
-				m_data.push_back((int) floor(decimalPart /= 1.0 / m_base));
-				decimalPart -= floor(decimalPart);
-			}
-		} while ((decimalPart > 0 && m_data.size() <= m_maximumPrecision) || asInt != 0);
+		construct<double>((double) *this, newBase, m_maximumPrecision);
 	}
 	unsigned int getBase() const
 	{
@@ -183,6 +122,14 @@ public:
 		return m_maximumPrecision;
 	}
 
+	//// Operators ////
+	// Conversion
+	operator short() const { return cast<short>(); }
+	operator int() const { return cast<int>(); }
+	operator long() const { return cast<long>(); }
+	operator double() const { return cast<double>(true); }
+
+	// Logic
 	bool operator==(const BaseInvariant& rhs) const
 	{
 		return m_data == rhs.m_data && m_base == rhs.m_base && m_isNegative == rhs.m_isNegative;
@@ -191,6 +138,8 @@ public:
 	{
 		return !(*this == rhs);
 	}
+
+	// Math/assignment
 	BaseInvariant& operator=(const BaseInvariant& rhs)
 	{
 		unsigned int baseBackup = m_base;
@@ -206,38 +155,17 @@ public:
 
 		return *this;
 	}
-	BaseInvariant operator+(const BaseInvariant& rhs) const
-	{
-		return BaseInvariant(toDouble() + rhs.toDouble(), m_base, m_maximumPrecision);
-	}
-	BaseInvariant operator-(const BaseInvariant& rhs) const
-	{
-		return BaseInvariant(toDouble() - rhs.toDouble(), m_base, m_maximumPrecision);
-	}
-	BaseInvariant operator*(const BaseInvariant& rhs)
-	{
-		return BaseInvariant(toDouble() * rhs.toDouble(), m_base, m_maximumPrecision);
-	}
-	BaseInvariant operator/(const BaseInvariant& rhs)
-	{
-		return BaseInvariant(toDouble() / rhs.toDouble(), m_base, m_maximumPrecision);
-	}
-	BaseInvariant& operator+=(const BaseInvariant& rhs)
-	{
-		return *this = *this + rhs;
-	}
-	BaseInvariant& operator-=(const BaseInvariant& rhs)
-	{
-		return *this = *this - rhs;
-	}
-	BaseInvariant& operator*=(const BaseInvariant& rhs)
-	{
-		return *this = *this * rhs;
-	}
-	BaseInvariant& operator/=(const BaseInvariant& rhs)
-	{
-		return *this = *this / rhs;
-	}
+	BaseInvariant operator+(const BaseInvariant& rhs) const { return perform(add<double>, rhs); }
+	BaseInvariant operator-(const BaseInvariant& rhs) const { return perform(subtract<double>, rhs); }
+	BaseInvariant operator*(const BaseInvariant& rhs) const { return perform(multiply<double>, rhs); }
+	BaseInvariant operator/(const BaseInvariant& rhs) const { return perform(divide<double>, rhs); }
+
+	BaseInvariant& operator+=(const BaseInvariant& rhs) { return perform_assign(add<BaseInvariant>, rhs); }
+	BaseInvariant& operator-=(const BaseInvariant& rhs) { return perform_assign(subtract<BaseInvariant>, rhs); }
+	BaseInvariant& operator*=(const BaseInvariant& rhs) { return perform_assign(multiply<BaseInvariant>, rhs); }
+	BaseInvariant& operator/=(const BaseInvariant& rhs) { return perform_assign(divide<BaseInvariant>, rhs); }
+
+	// Stream
 	friend istream& operator>>(istream& inputStream, BaseInvariant& instance)
 	{
 		int value;
