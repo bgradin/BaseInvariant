@@ -8,8 +8,8 @@ using namespace std;
 
 #define TEMPLATE template<typename T>
 
-#define DEFAULT_BASE 10
-#define DEFAULT_PRECISION 15
+#define STANDARD_BASE 10
+#define STANDARD_PRECISION 15
 
 #define base2(a) BaseInvariant(a, 2)
 #define base16(a) BaseInvariant(a, 16)
@@ -31,7 +31,7 @@ using namespace std;
 #define MULTIPLY_OPERATORS ALL_OPERATORS(operator*, multiply, *)
 #define DIVIDE_OPERATORS ALL_OPERATORS(operator/, divide, *)
 
-#define COPY_CONSTRUCTOR(type) BaseInvariant(type value, const int base = DEFAULT_BASE, const int precision = DEFAULT_PRECISION)\
+#define COPY_CONSTRUCTOR(type) BaseInvariant(type value, const int base = STANDARD_BASE, const int precision = STANDARD_PRECISION)\
 	{\
 		construct<type>(value, base, precision);\
 	}
@@ -94,8 +94,8 @@ class BaseInvariant
 public:
 	BaseInvariant()
 	{
-		m_base = DEFAULT_BASE;
-		m_maximumPrecision = DEFAULT_PRECISION;
+		m_base = STANDARD_BASE;
+		m_maximumPrecision = STANDARD_PRECISION;
 		m_decimalPosition = 1;
 		m_data.push_back(0);
 		m_isNegative = false;
