@@ -31,10 +31,9 @@ using namespace std;
 #define MULTIPLY_OPERATORS ALL_OPERATORS(operator*, multiply, *)
 #define DIVIDE_OPERATORS ALL_OPERATORS(operator/, divide, *)
 
-#define COPY_CONSTRUCTOR(type) BaseInvariant(type value, const int base = STANDARD_BASE, const int precision = STANDARD_PRECISION)\
-	{\
-		construct<type>(value, base, precision);\
-	}
+#define COPY_CONSTRUCTOR(type) \
+	BaseInvariant(type value, const int base = STANDARD_BASE, const int precision = STANDARD_PRECISION)\
+	{ construct<type>(value, base, precision); }
 
 class BaseInvariant
 {
@@ -202,6 +201,7 @@ public:
 	}
 };
 
+#undef TEMPLATE
 #undef OPERATORS
 #undef ALL_OPERATORS
 #undef ADD_OPERATORS
