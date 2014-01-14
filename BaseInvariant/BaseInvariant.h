@@ -10,6 +10,25 @@ using namespace std;
 #define DEFAULT_PRECISION 15
 #define base10(a) BaseInvariant(a, 10)
 
+#define OPERATORS(type, operatorName, operationName, operation) \
+	friend type operatorName(type lhs, const BaseInvariant& rhs) { return lhs operation (type) rhs; } \
+	friend BaseInvariant operatorName(const BaseInvariant& lhs, type rhs) { return lhs.perform(operationName<double>, base10(rhs)); }
+#define TYPED_OPERATORS(operatorName, operationName, operation) \
+	friend BaseInvariant operatorName(const BaseInvariant& lhs, const BaseInvariant& rhs) { return lhs.perform(operationName<double>, rhs); } \
+	OPERATORS(short, operatorName, operationName, operation) \
+	OPERATORS(int, operatorName, operationName, operation) \
+	OPERATORS(long, operatorName, operationName, operation) \
+	OPERATORS(double, operatorName, operationName, operation)
+#define ADD_OPERATORS TYPED_OPERATORS(operator+, add, +)
+#define SUBTRACT_OPERATORS TYPED_OPERATORS(operator-, subtract, -)
+#define MULTIPLY_OPERATORS TYPED_OPERATORS(operator*, multiply, *)
+#define DIVIDE_OPERATORS TYPED_OPERATORS(operator/, divide, *)
+
+#define COPY_CONSTRUCTOR(type) BaseInvariant(type value, const int base = DEFAULT_BASE, const int precision = DEFAULT_PRECISION)\
+	{\
+		construct<type>(value, base, precision);\
+	}
+
 class BaseInvariant
 {
 	unsigned int m_base, m_maximumPrecision, m_decimalPosition;
@@ -82,22 +101,10 @@ public:
 		m_data = other.m_data;
 		m_isNegative = other.m_isNegative;
 	}
-	BaseInvariant(short value, const int base = DEFAULT_BASE, const int precision = DEFAULT_PRECISION)
-	{
-		construct<short>(value, base, precision);
-	}
-	BaseInvariant(int value, const int base = DEFAULT_BASE, const int precision = DEFAULT_PRECISION)
-	{
-		construct<int>(value, base, precision);
-	}
-	BaseInvariant(long value, const int base = DEFAULT_BASE, const int precision = DEFAULT_PRECISION)
-	{
-		construct<long>(value, base, precision);
-	}
-	BaseInvariant(double value, const int base = DEFAULT_BASE, const int precision = DEFAULT_PRECISION)
-	{
-		construct<double>(value, base, precision);
-	}
+	COPY_CONSTRUCTOR(short);
+	COPY_CONSTRUCTOR(int);
+	COPY_CONSTRUCTOR(long);
+	COPY_CONSTRUCTOR(double);
 
 	void setBase(const int newBase)
 	{
@@ -155,10 +162,10 @@ public:
 
 		return *this;
 	}
-	BaseInvariant operator+(const BaseInvariant& rhs) const { return perform(add<double>, rhs); }
-	BaseInvariant operator-(const BaseInvariant& rhs) const { return perform(subtract<double>, rhs); }
-	BaseInvariant operator*(const BaseInvariant& rhs) const { return perform(multiply<double>, rhs); }
-	BaseInvariant operator/(const BaseInvariant& rhs) const { return perform(divide<double>, rhs); }
+	ADD_OPERATORS
+	SUBTRACT_OPERATORS
+	MULTIPLY_OPERATORS
+	DIVIDE_OPERATORS
 
 	BaseInvariant& operator+=(const BaseInvariant& rhs) { return perform_assign(add<BaseInvariant>, rhs); }
 	BaseInvariant& operator-=(const BaseInvariant& rhs) { return perform_assign(subtract<BaseInvariant>, rhs); }
@@ -189,4 +196,11 @@ public:
 	}
 };
 
+#undef OPERATORS
+#undef TYPED_OPERATORS
+#undef ADD_OPERATORS
+#undef SUBTRACT_OPERATORS
+#undef MULTIPLY_OPERATORS
+#undef DIVIDE_OPERATORS
+#undef COPY_CONSTRUCTOR
 #pragma warning(pop)

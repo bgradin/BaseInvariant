@@ -18,7 +18,7 @@ void main()
 	// As you can see above, numbers can be directly referenced when used in equations.
 	//   As demonstrated below, for use in expressions, numbers must be converted to
 	//   BaseInvariant through use of the base10(a) macro.
-	int test4 = (int) (test1 - base10(0.25));
+	int test4 = (int) (test1 - 0.25);
 
 	// Output numbers as a specific data type, or in their current base
 	// - Numbers in a specific base will be outputted with spaces in between each digit.
@@ -26,5 +26,5 @@ void main()
 	cout << "test1(int)    = " << (int) test1 << endl;
 	cout << "test1(double) = " << (double) test1 << endl;
 	cout << "test2         = " << test2 << endl;
-	cout << "test3 - 13    = " << test3 - base10(13) << endl;
+	cout << "test3 - 13    = " << test3 - 13 << endl;
 }
