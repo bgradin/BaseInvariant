@@ -4,10 +4,11 @@ using namespace std;
 
 void main()
 {
-	// Store numbers with different bases, and with or without fractional parts
+	// Store numbers with different bases, with or without fractional parts, and with variable precision
 	BaseInvariant test1 = 100;
-	BaseInvariant test2(10.25, 2);
-	BaseInvariant test3(-234, 31);
+	BaseInvariant test2 = base2(10.25);
+	BaseInvariant test3 = baseN(-234, 31);
+	BaseInvariant test4(10.0 / 3, 10, 2);
 
 	// Perform mathematical operations on numbers of different bases and/or data types
 	test1 += test2;
@@ -22,4 +23,5 @@ void main()
 	cout << "test1(double) = " << (double) test1 << endl;
 	cout << "test2         = " << test2 << endl;
 	cout << "test3 - 13    = " << test3 - 13 << endl;
+	cout << "test4         = " << test4 << endl;
 }
