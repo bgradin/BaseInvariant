@@ -11,6 +11,7 @@ using namespace std;
 #define base2(a) BaseInvariant(a, 2)
 #define base10(a) BaseInvariant(a, 10)
 #define base16(a) BaseInvariant(a, 16)
+#define baseN(a, n) BaseInvariant(a, n)
 
 #define OPERATORS(type, operatorName, operationName, operation) \
 	friend type operatorName(type lhs, const BaseInvariant& rhs) { return lhs operation (type) rhs; } \
