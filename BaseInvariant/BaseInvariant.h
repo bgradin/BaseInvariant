@@ -15,31 +15,27 @@ using namespace std;
 #define base16(a) BaseInvariant(a, 16)
 #define baseN(a, n) BaseInvariant(a, n)
 
-#define OPERATORS(type, operatorName, operationName, operation) \
-	friend type operatorName(type lhs, const BaseInvariant& rhs) { return lhs operation (type) rhs; } \
-	friend BaseInvariant operatorName(const BaseInvariant& lhs, type rhs) { return lhs.perform(operationName<double>, BaseInvariant(rhs)); }
-
-#define ALL_OPERATORS(operatorName, operationName, operation) \
-	friend BaseInvariant operatorName(const BaseInvariant& lhs, const BaseInvariant& rhs) { return lhs.perform(operationName<double>, rhs); } \
-	OPERATORS(short, operatorName, operationName, operation) \
-	OPERATORS(int, operatorName, operationName, operation) \
-	OPERATORS(long, operatorName, operationName, operation) \
-	OPERATORS(double, operatorName, operationName, operation)
-
-#define ADD_OPERATORS ALL_OPERATORS(operator+, add, +)
-#define SUBTRACT_OPERATORS ALL_OPERATORS(operator-, subtract, -)
-#define MULTIPLY_OPERATORS ALL_OPERATORS(operator*, multiply, *)
-#define DIVIDE_OPERATORS ALL_OPERATORS(operator/, divide, *)
-
-#define COPY_CONSTRUCTOR(type) \
-	BaseInvariant(type value, const int base = STANDARD_BASE, const int precision = STANDARD_PRECISION)\
-	{ construct<type>(value, base, precision); }
-
 class BaseInvariant
 {
-	unsigned int m_base, m_maximumPrecision, m_decimalPosition;
-	deque<int> m_data;
-	bool m_isNegative;
+	#define OPERATORS(type, operatorName, operationName, operation) \
+		friend type operatorName(type lhs, const BaseInvariant& rhs) { return lhs operation (type) rhs; } \
+		friend BaseInvariant operatorName(const BaseInvariant& lhs, type rhs) { return lhs.perform(operationName<double>, BaseInvariant(rhs)); }
+
+	#define ALL_OPERATORS(operatorName, operationName, operation) \
+		friend BaseInvariant operatorName(const BaseInvariant& lhs, const BaseInvariant& rhs) { return lhs.perform(operationName<double>, rhs); } \
+		OPERATORS(short, operatorName, operationName, operation) \
+		OPERATORS(int, operatorName, operationName, operation) \
+		OPERATORS(long, operatorName, operationName, operation) \
+		OPERATORS(double, operatorName, operationName, operation)
+
+	#define ADD_OPERATORS ALL_OPERATORS(operator+, add, +)
+	#define SUBTRACT_OPERATORS ALL_OPERATORS(operator-, subtract, -)
+	#define MULTIPLY_OPERATORS ALL_OPERATORS(operator*, multiply, *)
+	#define DIVIDE_OPERATORS ALL_OPERATORS(operator/, divide, *)
+
+	#define COPY_CONSTRUCTOR(type) \
+		BaseInvariant(type value, const int base = STANDARD_BASE, const int precision = STANDARD_PRECISION)\
+		{ construct<type>(value, base, precision); }
 
 	TEMPLATE static T add(T a, T b) { return a + b; }
 	TEMPLATE static T subtract(T a, T b) { return a - b; }
@@ -89,6 +85,10 @@ class BaseInvariant
 			}
 		} while ((decimalPart > 0 && m_data.size() <= m_maximumPrecision) || integerPart != 0);
 	}
+
+	unsigned int m_base, m_maximumPrecision, m_decimalPosition;
+	deque<int> m_data;
+	bool m_isNegative;
 
 public:
 	BaseInvariant()
