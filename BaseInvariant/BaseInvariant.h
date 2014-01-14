@@ -6,8 +6,6 @@ using namespace std;
 
 #pragma warning(push, 3)
 
-#define TEMPLATE template<typename T>
-
 #define STANDARD_BASE 10
 #define STANDARD_PRECISION 15
 
@@ -17,6 +15,8 @@ using namespace std;
 
 class BaseInvariant
 {
+	#define TEMPLATE template<typename T>
+
 	#define OPERATORS(type, operatorName, operationName, operation) \
 		friend type operatorName(type lhs, const BaseInvariant& rhs) { return lhs operation (type) rhs; } \
 		friend BaseInvariant operatorName(const BaseInvariant& lhs, type rhs) { return lhs.perform(operationName<double>, BaseInvariant(rhs)); }
