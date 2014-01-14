@@ -4,7 +4,7 @@ using namespace std;
 
 void main()
 {
-	// Store doubles or integers
+	// Store numbers with different bases, and with or without fractional parts
 	BaseInvariant test1 = 100;
 	BaseInvariant test2(10.25, 2);
 	BaseInvariant test3(-234, 31);
