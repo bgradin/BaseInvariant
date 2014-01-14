@@ -205,7 +205,8 @@ public:
 	{
 		m_data = rhs.m_data;
 
-		setBase(m_base);
+		if (m_base != rhs.m_base)
+			setBase(m_base);
 
 		return *this;
 	}
@@ -265,9 +266,49 @@ public:
 	{
 		return *this - BaseInvariant(rhs);
 	}
+	BaseInvariant operator*(const BaseInvariant& rhs)
+	{
+		return BaseInvariant(toDouble() * rhs.toDouble());
+	}
+	BaseInvariant operator*(const short& rhs)
+	{
+		return *this * BaseInvariant(rhs);
+	}
+	BaseInvariant operator*(const int& rhs)
+	{
+		return *this * BaseInvariant(rhs);
+	}
+	BaseInvariant operator*(const long& rhs)
+	{
+		return *this * BaseInvariant(rhs);
+	}
+	BaseInvariant operator*(const double& rhs)
+	{
+		return *this * BaseInvariant(rhs);
+	}
+	BaseInvariant operator/(const BaseInvariant& rhs)
+	{
+		return BaseInvariant(toDouble() / rhs.toDouble());
+	}
+	BaseInvariant operator/(const short& rhs)
+	{
+		return *this / BaseInvariant(rhs);
+	}
+	BaseInvariant operator/(const int& rhs)
+	{
+		return *this / BaseInvariant(rhs);
+	}
+	BaseInvariant operator/(const long& rhs)
+	{
+		return *this / BaseInvariant(rhs);
+	}
 	BaseInvariant& operator+=(const BaseInvariant& rhs)
 	{
 		return *this = *this + rhs;
+	}
+	BaseInvariant operator/(const double& rhs)
+	{
+		return *this / BaseInvariant(rhs);
 	}
 	BaseInvariant& operator+=(const short& rhs)
 	{
@@ -304,6 +345,46 @@ public:
 	BaseInvariant& operator-=(const double& rhs)
 	{
 		return *this = *this - rhs;
+	}
+	BaseInvariant& operator*=(const BaseInvariant& rhs)
+	{
+		return *this = *this * rhs;
+	}
+	BaseInvariant& operator*=(const short& rhs)
+	{
+		return *this = *this * rhs;
+	}
+	BaseInvariant& operator*=(const int& rhs)
+	{
+		return *this = *this * rhs;
+	}
+	BaseInvariant& operator*=(const long& rhs)
+	{
+		return *this = *this * rhs;
+	}
+	BaseInvariant& operator*=(const double& rhs)
+	{
+		return *this = *this * rhs;
+	}
+	BaseInvariant& operator/=(const BaseInvariant& rhs)
+	{
+		return *this = *this / rhs;
+	}
+	BaseInvariant& operator/=(const short& rhs)
+	{
+		return *this = *this / rhs;
+	}
+	BaseInvariant& operator/=(const int& rhs)
+	{
+		return *this = *this / rhs;
+	}
+	BaseInvariant& operator/=(const long& rhs)
+	{
+		return *this = *this / rhs;
+	}
+	BaseInvariant& operator/=(const double& rhs)
+	{
+		return *this = *this / rhs;
 	}
 	friend istream& operator>>(istream& inputStream, BaseInvariant& instance)
 	{
