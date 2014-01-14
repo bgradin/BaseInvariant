@@ -15,16 +15,16 @@ using namespace std;
 #define OPERATORS(type, operatorName, operationName, operation) \
 	friend type operatorName(type lhs, const BaseInvariant& rhs) { return lhs operation (type) rhs; } \
 	friend BaseInvariant operatorName(const BaseInvariant& lhs, type rhs) { return lhs.perform(operationName<double>, base10(rhs)); }
-#define TYPED_OPERATORS(operatorName, operationName, operation) \
+#define ALL_OPERATORS(operatorName, operationName, operation) \
 	friend BaseInvariant operatorName(const BaseInvariant& lhs, const BaseInvariant& rhs) { return lhs.perform(operationName<double>, rhs); } \
 	OPERATORS(short, operatorName, operationName, operation) \
 	OPERATORS(int, operatorName, operationName, operation) \
 	OPERATORS(long, operatorName, operationName, operation) \
 	OPERATORS(double, operatorName, operationName, operation)
-#define ADD_OPERATORS TYPED_OPERATORS(operator+, add, +)
-#define SUBTRACT_OPERATORS TYPED_OPERATORS(operator-, subtract, -)
-#define MULTIPLY_OPERATORS TYPED_OPERATORS(operator*, multiply, *)
-#define DIVIDE_OPERATORS TYPED_OPERATORS(operator/, divide, *)
+#define ADD_OPERATORS ALL_OPERATORS(operator+, add, +)
+#define SUBTRACT_OPERATORS ALL_OPERATORS(operator-, subtract, -)
+#define MULTIPLY_OPERATORS ALL_OPERATORS(operator*, multiply, *)
+#define DIVIDE_OPERATORS ALL_OPERATORS(operator/, divide, *)
 
 #define COPY_CONSTRUCTOR(type) BaseInvariant(type value, const int base = DEFAULT_BASE, const int precision = DEFAULT_PRECISION)\
 	{\
@@ -168,7 +168,6 @@ public:
 	SUBTRACT_OPERATORS
 	MULTIPLY_OPERATORS
 	DIVIDE_OPERATORS
-
 	BaseInvariant& operator+=(const BaseInvariant& rhs) { return perform_assign(add<BaseInvariant>, rhs); }
 	BaseInvariant& operator-=(const BaseInvariant& rhs) { return perform_assign(subtract<BaseInvariant>, rhs); }
 	BaseInvariant& operator*=(const BaseInvariant& rhs) { return perform_assign(multiply<BaseInvariant>, rhs); }
@@ -199,7 +198,7 @@ public:
 };
 
 #undef OPERATORS
-#undef TYPED_OPERATORS
+#undef ALL_OPERATORS
 #undef ADD_OPERATORS
 #undef SUBTRACT_OPERATORS
 #undef MULTIPLY_OPERATORS
