@@ -5,23 +5,27 @@
 using namespace std;
 
 #pragma warning(push, 3)
+
 #define TEMPLATE template<typename T>
+
 #define DEFAULT_BASE 10
 #define DEFAULT_PRECISION 15
+
 #define base2(a) BaseInvariant(a, 2)
-#define base10(a) BaseInvariant(a, 10)
 #define base16(a) BaseInvariant(a, 16)
 #define baseN(a, n) BaseInvariant(a, n)
 
 #define OPERATORS(type, operatorName, operationName, operation) \
 	friend type operatorName(type lhs, const BaseInvariant& rhs) { return lhs operation (type) rhs; } \
-	friend BaseInvariant operatorName(const BaseInvariant& lhs, type rhs) { return lhs.perform(operationName<double>, base10(rhs)); }
+	friend BaseInvariant operatorName(const BaseInvariant& lhs, type rhs) { return lhs.perform(operationName<double>, BaseInvariant(rhs)); }
+
 #define ALL_OPERATORS(operatorName, operationName, operation) \
 	friend BaseInvariant operatorName(const BaseInvariant& lhs, const BaseInvariant& rhs) { return lhs.perform(operationName<double>, rhs); } \
 	OPERATORS(short, operatorName, operationName, operation) \
 	OPERATORS(int, operatorName, operationName, operation) \
 	OPERATORS(long, operatorName, operationName, operation) \
 	OPERATORS(double, operatorName, operationName, operation)
+
 #define ADD_OPERATORS ALL_OPERATORS(operator+, add, +)
 #define SUBTRACT_OPERATORS ALL_OPERATORS(operator-, subtract, -)
 #define MULTIPLY_OPERATORS ALL_OPERATORS(operator*, multiply, *)
