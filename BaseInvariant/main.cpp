@@ -19,9 +19,11 @@ void main()
 	// Output numbers as a specific data type, or in their current base
 	// - Numbers in a specific base will be outputted with spaces in between each digit.
 	//   Otherwise, it's impossible to tell where one digit ends and the next begins
-	cout << "test1(int)    = " << (int) test1 << endl;
-	cout << "test1(double) = " << (double) test1 << endl;
-	cout << "test2         = " << test2 << endl;
-	cout << "test3 - 13    = " << test3 - 13 << endl;
-	cout << "test4         = " << test4 << endl;
+	cout << "test1(int)           = " << (int) test1 << endl;
+	cout << "test1(double)        = " << (double) test1 << endl;
+	cout << "test2                = " << test2 << endl;
+	cout << "test3                = " << test3 << endl;
+	cout << "test3 - 13 (base " << test3.getBase() << ") = " << test3 - 13 << endl;
+	cout << "test3 - 13 (base 10) = " << (double) test3 - 13 << endl;
+	cout << "test4                = " << test4 << endl;
 }
