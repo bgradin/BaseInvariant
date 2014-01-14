@@ -6,7 +6,7 @@ using namespace std;
 
 class BaseInvariant
 {
-	int m_base, m_decimalPosition;
+	unsigned int m_base, m_maximumPrecision, m_decimalPosition;
 	deque<int> m_data;
 	bool m_isNegative;
 
@@ -14,6 +14,7 @@ public:
 	BaseInvariant()
 	{
 		m_base = 10;
+		m_maximumPrecision = 15;
 		m_decimalPosition = 1;
 		m_data.push_back(0);
 		m_isNegative = false;
@@ -21,13 +22,15 @@ public:
 	BaseInvariant(const BaseInvariant& other)
 	{
 		m_base = other.m_base;
+		m_maximumPrecision = other.m_maximumPrecision;
 		m_decimalPosition = other.m_decimalPosition;
 		m_data = other.m_data;
 		m_isNegative = other.m_isNegative;
 	}
-	BaseInvariant(short value, const int base = 10)
+	BaseInvariant(short value, const int base = 10, const int precision = 15)
 	{
 		m_base = base;
+		m_maximumPrecision = precision;
 		m_isNegative = value < 0;
 		m_decimalPosition = 0;
 		
@@ -40,9 +43,10 @@ public:
 			value /= m_base;
 		} while (value != 0);
 	}
-	BaseInvariant(int value, const int base = 10)
+	BaseInvariant(int value, const int base = 10, const int precision = 15)
 	{
 		m_base = base;
+		m_maximumPrecision = precision;
 		m_isNegative = value < 0;
 		m_decimalPosition = 0;
 
@@ -55,9 +59,10 @@ public:
 			value /= m_base;
 		} while (value != 0);
 	}
-	BaseInvariant(long value, const int base = 10)
+	BaseInvariant(long value, const int base = 10, const int precision = 15)
 	{
 		m_base = base;
+		m_maximumPrecision = precision;
 		m_isNegative = value < 0;
 		m_decimalPosition = 0;
 		
@@ -70,9 +75,10 @@ public:
 			value /= m_base;
 		} while (value != 0);
 	}
-	BaseInvariant(double value, const int base = 10)
+	BaseInvariant(double value, const int base = 10, const int precision = 15)
 	{
 		m_base = base;
+		m_maximumPrecision = precision;
 		m_isNegative = value < 0;
 		m_decimalPosition = 0;
 
@@ -87,20 +93,20 @@ public:
 				integerPart /= m_base;
 				m_decimalPosition++;
 			}
-			if (decimalPart > 0)
+			if (decimalPart > 0 && m_data.size() <= m_maximumPrecision)
 			{
 				m_data.push_back((int) floor(decimalPart /= 1.0 / m_base));
 				decimalPart -= floor(decimalPart);
 			}
-		} while (decimalPart > 0 || integerPart != 0);
+		} while ((decimalPart > 0 && m_data.size() <= m_maximumPrecision) || integerPart != 0);
 	}
 
 	short toShort() const
 	{
 		short returnValue = 0;
 
-		for (int i = 0; i < (int) m_data.size() && i < m_decimalPosition; i++)
-			returnValue += (short) (m_data[i] * (int) pow(m_base, m_decimalPosition - i - 1));
+		for (int i = 0; i < (int) m_data.size() && i < (int) m_decimalPosition; i++)
+			returnValue += (short) (m_data[i] * (int) pow(m_base, (int) m_decimalPosition - i - 1));
 
 		return m_isNegative ? -returnValue : returnValue;
 	}
@@ -108,8 +114,8 @@ public:
 	{
 		int returnValue = 0;
 
-		for (int i = 0; i < (int) m_data.size() && i < m_decimalPosition; i++)
-			returnValue += (int) (m_data[i] * pow(m_base, m_decimalPosition - i - 1));
+		for (int i = 0; i < (int) m_data.size() && i < (int) m_decimalPosition; i++)
+			returnValue += (int) (m_data[i] * pow(m_base, (int) m_decimalPosition - i - 1));
 
 		return m_isNegative ? -returnValue : returnValue;
 	}
@@ -117,8 +123,8 @@ public:
 	{
 		long returnValue = 0;
 
-		for (int i = 0; i < (int) m_data.size() && i < m_decimalPosition; i++)
-			returnValue += (long) (m_data[i] * pow(m_base, m_decimalPosition - i - 1));
+		for (int i = 0; i < (int) m_data.size() && i < (int) m_decimalPosition; i++)
+			returnValue += (long) (m_data[i] * pow(m_base, (int) m_decimalPosition - i - 1));
 
 		return m_isNegative ? -returnValue : returnValue;
 	}
@@ -127,7 +133,7 @@ public:
 		double returnValue = 0;
 
 		for (int i = 0; i < (int) m_data.size(); i++)
-			returnValue += ((double) m_data[i]) * pow(m_base, m_decimalPosition - i - 1);
+			returnValue += ((double) m_data[i]) * pow(m_base, (int) m_decimalPosition - i - 1);
 
 		return m_isNegative ? -returnValue : returnValue;
 	}
@@ -149,16 +155,30 @@ public:
 				asInt /= m_base;
 				m_decimalPosition++;
 			}
-			if (decimalPart > 0)
+			if (decimalPart > 0 && m_data.size() <= m_maximumPrecision)
 			{
 				m_data.push_back((int) floor(decimalPart /= 1.0 / m_base));
 				decimalPart -= floor(decimalPart);
 			}
-		} while (decimalPart > 0 || asInt != 0);
+		} while ((decimalPart > 0 && m_data.size() <= m_maximumPrecision) || asInt != 0);
 	}
 	unsigned int getBase() const
 	{
 		return m_base;
+	}
+	void setPrecision(const int newPrecision)
+	{
+		m_maximumPrecision = newPrecision;
+
+		for (unsigned int i = 0; i < newPrecision - (m_data.size() - m_decimalPosition); i++)
+			m_data.push_back(0);
+
+		for (unsigned int i = 0; i < (m_data.size() - m_decimalPosition) - newPrecision; i++)
+			m_data.pop_back();
+	}
+	unsigned int getPrecision() const
+	{
+		return m_maximumPrecision;
 	}
 
 	bool operator==(const BaseInvariant& rhs) const
@@ -203,10 +223,16 @@ public:
 	}
 	BaseInvariant& operator=(const BaseInvariant& rhs)
 	{
-		m_data = rhs.m_data;
+		unsigned int baseBackup = m_base;
 
-		if (m_base != rhs.m_base)
-			setBase(m_base);
+		m_base = rhs.m_base;
+		m_data = rhs.m_data;
+		m_isNegative = rhs.m_isNegative;
+		m_maximumPrecision = rhs.m_maximumPrecision;
+		m_decimalPosition = rhs.m_decimalPosition;
+
+		if (m_base != baseBackup)
+			setBase(baseBackup);
 
 		return *this;
 	}
@@ -228,7 +254,7 @@ public:
 	}
 	BaseInvariant operator+(const BaseInvariant& rhs) const
 	{
-		return BaseInvariant(toDouble() + rhs.toDouble());
+		return BaseInvariant(toDouble() + rhs.toDouble(), m_base, m_maximumPrecision);
 	}
 	BaseInvariant operator+(const short& rhs) const
 	{
@@ -248,7 +274,7 @@ public:
 	}
 	BaseInvariant operator-(const BaseInvariant& rhs) const
 	{
-		return BaseInvariant(toDouble() - rhs.toDouble());
+		return BaseInvariant(toDouble() - rhs.toDouble(), m_base, m_maximumPrecision);
 	}
 	BaseInvariant operator-(const short& rhs)
 	{
@@ -268,7 +294,7 @@ public:
 	}
 	BaseInvariant operator*(const BaseInvariant& rhs)
 	{
-		return BaseInvariant(toDouble() * rhs.toDouble());
+		return BaseInvariant(toDouble() * rhs.toDouble(), m_base, m_maximumPrecision);
 	}
 	BaseInvariant operator*(const short& rhs)
 	{
@@ -288,7 +314,7 @@ public:
 	}
 	BaseInvariant operator/(const BaseInvariant& rhs)
 	{
-		return BaseInvariant(toDouble() / rhs.toDouble());
+		return BaseInvariant(toDouble() / rhs.toDouble(), m_base, m_maximumPrecision);
 	}
 	BaseInvariant operator/(const short& rhs)
 	{
@@ -302,13 +328,13 @@ public:
 	{
 		return *this / BaseInvariant(rhs);
 	}
-	BaseInvariant& operator+=(const BaseInvariant& rhs)
-	{
-		return *this = *this + rhs;
-	}
 	BaseInvariant operator/(const double& rhs)
 	{
 		return *this / BaseInvariant(rhs);
+	}
+	BaseInvariant& operator+=(const BaseInvariant& rhs)
+	{
+		return *this = *this + rhs;
 	}
 	BaseInvariant& operator+=(const short& rhs)
 	{

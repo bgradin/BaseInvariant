@@ -21,5 +21,5 @@ void main()
 	cout << "test1(int)    = " << test1.toInt() << endl;
 	cout << "test1(double) = " << test1.toDouble() << endl;
 	cout << "test2         = " << test2 << endl;
-	cout << "test3 - 16    = " << test3 - 13 << endl;
+	cout << "test3 - 13    = " << test3 - 13 << endl;
 }
