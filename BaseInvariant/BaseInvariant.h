@@ -1,10 +1,16 @@
 #pragma once
 #include <deque>
+#include <istream>
+#include <ostream>
 using namespace std;
+
+#ifndef UINT
+typedef unsigned int UINT;
+#endif
 
 class BaseInvariant
 {
-	unsigned int m_base, m_decimalPosition;
+	UINT m_base, m_decimalPosition;
 	deque<int> m_data;
 	bool m_isNegative;
 
@@ -41,7 +47,7 @@ public:
 	{
 		int returnValue = 0;
 
-		for (unsigned int i = 0; i < m_data.size() && i < m_decimalPosition; i--)
+		for (UINT i = 0; i < m_data.size() && i < m_decimalPosition; i--)
 			returnValue += m_data[i] * (int) pow(m_base, m_decimalPosition - i - 1);
 
 		return m_isNegative ? -returnValue : returnValue;
@@ -50,7 +56,7 @@ public:
 	{
 		double returnValue = 0;
 
-		for (unsigned int i = 0; i < m_data.size(); i++)
+		for (UINT i = 0; i < m_data.size(); i++)
 			returnValue += (double) m_data[i] * pow(m_base, m_decimalPosition - i - 1);
 
 		return m_isNegative ? -returnValue : returnValue;
@@ -78,6 +84,10 @@ public:
 			if (decimalPart > 0)
 				m_data.push_back((int) floor(decimalPart /= currentPower /= m_base));
 		} while (decimalPart > 0);
+	}
+	UINT getBase()
+	{
+		return m_base;
 	}
 
 	bool operator==(BaseInvariant& rhs)
@@ -111,5 +121,23 @@ public:
 	BaseInvariant& operator-=(BaseInvariant& rhs)
 	{
 		return *this = *this - rhs;
+	}
+	friend istream& operator>>(istream& inputStream, BaseInvariant& instance)
+	{
+		int value;
+		inputStream >> value;
+
+		instance = BaseInvariant(value);
+
+		return inputStream;
+	}
+	friend ostream& operator<<(ostream& outputStream, const BaseInvariant& instance)
+	{
+		outputStream << instance.m_data[0];
+
+		for (UINT i = 1; i < instance.m_data.size(); i++)
+			outputStream << " " << instance.m_data[i];
+
+		return outputStream;
 	}
 };
