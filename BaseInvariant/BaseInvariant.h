@@ -2,6 +2,7 @@
 #include <deque>
 #include <istream>
 #include <ostream>
+#include <functional>
 using namespace std;
 
 #pragma warning(push, 3)
@@ -21,39 +22,25 @@ class BaseInvariant
 {
 	#define TEMPLATE template<typename T>
 
-	#define OPERATORS(type, operatorName, operationName, operation) \
-		friend type operatorName(type lhs, const BaseInvariant& rhs) { return lhs operation (type) rhs; } \
-		friend BaseInvariant operatorName(const BaseInvariant& lhs, type rhs) { return lhs.perform(operationName<double>, BaseInvariant(rhs)); }
+	#define RELATIONAL_OPERATOR(operation) bool operator##operation(const BaseInvariant& rhs)\
+		{ return (double) *this operation (double) rhs; }
 
-	#define ALL_OPERATORS(operatorName, operationName, operation) \
-		friend BaseInvariant operatorName(const BaseInvariant& lhs, const BaseInvariant& rhs) { return lhs.perform(operationName<double>, rhs); } \
-		OPERATORS(short, operatorName, operationName, operation) \
-		OPERATORS(int, operatorName, operationName, operation) \
-		OPERATORS(long, operatorName, operationName, operation) \
-		OPERATORS(double, operatorName, operationName, operation)
+	#define OPERATORS(type, operation)\
+		friend type operator##operation(type lhs, const BaseInvariant& rhs) { return lhs operation (type) rhs; }\
+		friend BaseInvariant operator##operation(const BaseInvariant& lhs, type rhs) { return lhs operation BaseInvariant(rhs); }
 
-	#define ADD_OPERATORS ALL_OPERATORS(operator+, add, +)
-	#define SUBTRACT_OPERATORS ALL_OPERATORS(operator-, subtract, -)
-	#define MULTIPLY_OPERATORS ALL_OPERATORS(operator*, multiply, *)
-	#define DIVIDE_OPERATORS ALL_OPERATORS(operator/, divide, *)
+	#define ALL_OPERATORS(operation)\
+		friend BaseInvariant operator##operation(const BaseInvariant& lhs, const BaseInvariant& rhs)\
+			{ return BaseInvariant((double) lhs operation (double) rhs, lhs.m_base); }\
+		OPERATORS(short, operation)\
+		OPERATORS(int, operation)\
+		OPERATORS(long, operation)\
+		OPERATORS(double, operation)
 
-	#define COPY_CONSTRUCTOR(type) \
+	#define COPY_CONSTRUCTOR(type)\
 		BaseInvariant(type value, const int base = STANDARD_BASE, const int precision = STANDARD_PRECISION)\
 		{ construct<type>(value, base, precision); }
 
-	TEMPLATE static T add(T a, T b) { return a + b; }
-	TEMPLATE static T subtract(T a, T b) { return a - b; }
-	TEMPLATE static T multiply(T a, T b) { return a * b; }
-	TEMPLATE static T divide(T a, T b) { return a / b; }
-
-	TEMPLATE BaseInvariant perform(T (*operation)(T, T), const BaseInvariant& rhs) const
-	{
-		return BaseInvariant(operation((T) *this, (T) rhs), m_base, m_maximumPrecision);
-	}
-	TEMPLATE BaseInvariant& perform_assign(T (*operation)(T, T), const BaseInvariant& rhs)
-	{
-		return *this = operation((T) *this, (T) rhs);
-	}
 	TEMPLATE T cast(bool hasDecimals = false) const
 	{
 		T returnValue = 0;
@@ -150,7 +137,7 @@ public:
 	operator long() const { return cast<long>(); }
 	operator double() const { return cast<double>(true); }
 
-	// Logic
+	// Logical
 	bool operator==(const BaseInvariant& rhs) const
 	{
 		return m_data == rhs.m_data && m_base == rhs.m_base && m_isNegative == rhs.m_isNegative;
@@ -159,6 +146,12 @@ public:
 	{
 		return !(*this == rhs);
 	}
+
+	// Relational
+	RELATIONAL_OPERATOR(<);
+	RELATIONAL_OPERATOR(>);
+	RELATIONAL_OPERATOR(<=);
+	RELATIONAL_OPERATOR(>=);
 
 	// Math/assignment
 	BaseInvariant& operator=(const BaseInvariant& rhs)
@@ -172,14 +165,14 @@ public:
 
 		return *this;
 	}
-	ADD_OPERATORS
-	SUBTRACT_OPERATORS
-	MULTIPLY_OPERATORS
-	DIVIDE_OPERATORS
-	BaseInvariant& operator+=(const BaseInvariant& rhs) { return perform_assign(add<BaseInvariant>, rhs); }
-	BaseInvariant& operator-=(const BaseInvariant& rhs) { return perform_assign(subtract<BaseInvariant>, rhs); }
-	BaseInvariant& operator*=(const BaseInvariant& rhs) { return perform_assign(multiply<BaseInvariant>, rhs); }
-	BaseInvariant& operator/=(const BaseInvariant& rhs) { return perform_assign(divide<BaseInvariant>, rhs); }
+	ALL_OPERATORS(+)
+	ALL_OPERATORS(-)
+	ALL_OPERATORS(*)
+	ALL_OPERATORS(/)
+	BaseInvariant& operator+=(const BaseInvariant& rhs) { return *this = *this + rhs; }
+	BaseInvariant& operator-=(const BaseInvariant& rhs) { return *this = *this - rhs; }
+	BaseInvariant& operator*=(const BaseInvariant& rhs) { return *this = *this * rhs; }
+	BaseInvariant& operator/=(const BaseInvariant& rhs) { return *this = *this / rhs; }
 
 	// Stream
 	friend istream& operator>>(istream& inputStream, BaseInvariant& instance)
@@ -207,10 +200,7 @@ public:
 
 #undef TEMPLATE
 #undef OPERATORS
+#undef RELATIONAL_OPERATOR
 #undef ALL_OPERATORS
-#undef ADD_OPERATORS
-#undef SUBTRACT_OPERATORS
-#undef MULTIPLY_OPERATORS
-#undef DIVIDE_OPERATORS
 #undef COPY_CONSTRUCTOR
 #pragma warning(pop)
