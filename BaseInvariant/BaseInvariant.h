@@ -19,16 +19,16 @@ typedef unsigned int UINT;
 
 class BaseInvariant
 {
-	#define TEMPLATE template<typename T>
-
 	#define RELATIONAL_OPERATOR(operation) bool operator##operation(const BaseInvariant& rhs)\
 		{ return (double) *this operation (double) rhs; }
+
+	#define CONVERSION_OPERATOR(type) operator type() const { return cast<type>(); }
 
 	#define OPERATORS(type, operation)\
 		friend type operator##operation(type lhs, const BaseInvariant& rhs) { return lhs operation (type) rhs; }\
 		friend BaseInvariant operator##operation(const BaseInvariant& lhs, type rhs) { return lhs operation BaseInvariant(rhs); }
 
-	#define ALL_OPERATORS(operation)\
+	#define MATH_OPERATORS(operation)\
 		friend BaseInvariant operator##operation(const BaseInvariant& lhs, const BaseInvariant& rhs)\
 			{ return BaseInvariant((double) lhs operation (double) rhs, lhs.m_base); }\
 		OPERATORS(short, operation)\
@@ -36,20 +36,25 @@ class BaseInvariant
 		OPERATORS(long, operation)\
 		OPERATORS(double, operation)
 
+	#define MATH_ASSIGNMENT_OPERATOR(operation) BaseInvariant& operator##operation##=(const BaseInvariant& rhs) { return *this = *this operation rhs; }
+
 	#define COPY_CONSTRUCTOR(type)\
 		BaseInvariant(type value, const int base = STANDARD_BASE, const int precision = STANDARD_PRECISION)\
 		{ construct<type>(value, base, precision); }
 
-	TEMPLATE T cast(bool hasDecimals = false) const
+	template<typename T>
+	T cast() const
 	{
 		T returnValue = 0;
 
-		for (int i = 0; i < (int) m_data.size() && (hasDecimals ? true : i < (int) m_decimalPosition); i++)
+		for (int i = 0; i < (int) m_data.size(); i++)
 			returnValue += (T) m_data[i] * (T) pow(m_base, (int) m_decimalPosition - i - 1);
 
 		return m_isNegative ? -returnValue : returnValue;
 	}
-	TEMPLATE void construct(T value, int base, int precision)
+
+	template<typename T>
+	void construct(T value, int base, int precision)
 	{
 		m_base = base;
 		m_maximumPrecision = precision;
@@ -130,11 +135,10 @@ public:
 	}
 
 	//// Operators ////
-	// Conversion
-	operator short() const { return cast<short>(); }
-	operator int() const { return cast<int>(); }
-	operator long() const { return cast<long>(); }
-	operator double() const { return cast<double>(true); }
+	CONVERSION_OPERATOR(short)
+	CONVERSION_OPERATOR(int)
+	CONVERSION_OPERATOR(long)
+	CONVERSION_OPERATOR(double)
 
 	// Logical
 	bool operator==(const BaseInvariant& rhs) const
@@ -164,14 +168,14 @@ public:
 
 		return *this;
 	}
-	ALL_OPERATORS(+)
-	ALL_OPERATORS(-)
-	ALL_OPERATORS(*)
-	ALL_OPERATORS(/)
-	BaseInvariant& operator+=(const BaseInvariant& rhs) { return *this = *this + rhs; }
-	BaseInvariant& operator-=(const BaseInvariant& rhs) { return *this = *this - rhs; }
-	BaseInvariant& operator*=(const BaseInvariant& rhs) { return *this = *this * rhs; }
-	BaseInvariant& operator/=(const BaseInvariant& rhs) { return *this = *this / rhs; }
+	MATH_OPERATORS(+)
+	MATH_OPERATORS(-)
+	MATH_OPERATORS(*)
+	MATH_OPERATORS(/)
+	MATH_ASSIGNMENT_OPERATOR(+)
+	MATH_ASSIGNMENT_OPERATOR(-)
+	MATH_ASSIGNMENT_OPERATOR(*)
+	MATH_ASSIGNMENT_OPERATOR(/)
 
 	// Stream
 	friend istream& operator>>(istream& inputStream, BaseInvariant& instance)
@@ -197,9 +201,10 @@ public:
 	}
 };
 
-#undef TEMPLATE
 #undef OPERATORS
 #undef RELATIONAL_OPERATOR
-#undef ALL_OPERATORS
+#undef CONVERSION_OPERATOR
+#undef MATH_OPERATORS
+#undef MATH_ASSIGNMENT_OPERATOR
 #undef COPY_CONSTRUCTOR
 #pragma warning(pop)
