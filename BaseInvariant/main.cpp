@@ -20,6 +20,7 @@ void main()
 	test2 -= 0.05;
 	test2 *= 2;
 	test3 /= 2;
+	test5++;
 
 	// Output numbers as a specific data type, or in their current base
 	// - Numbers in a specific base will be outputted with spaces in between each digit.
