@@ -9,6 +9,7 @@ void main()
 	BaseInvariant test2 = base2(10.25);
 	BaseInvariant test3 = baseN(-234, 31);
 	BaseInvariant test4(10.0 / 3, 10, 7);
+	BaseInvariant test5(100, 6);
 
 	// Modify precision or base
 	test4.setPrecision(4);
@@ -35,5 +36,8 @@ void main()
 	cout << endl;
 	cout << "test4 (base " << test4.getBase() << ")       = " << test4 << endl;
 	cout << "test4 (base 10)      = " << (double) test4 << endl;
+	cout << endl;
+	cout << "test5 (base 6)       = " << test5 << endl;
+	cout << "test5 % 21 (base 6)  = " << test5 % 21 << endl;
 	cout << endl;
 }
