@@ -199,6 +199,24 @@ public:
 	MATH_ASSIGNMENT_OPERATOR(*)
 	MATH_ASSIGNMENT_OPERATOR(/)
 	MATH_ASSIGNMENT_OPERATOR(%)
+	BaseInvariant& operator++()
+	{
+		return *this = *this + 1;
+	}
+	BaseInvariant operator++(int num)
+	{
+		++*this;
+		return BaseInvariant(num);
+	}
+	BaseInvariant& operator--()
+	{
+		return *this = *this - 1;
+	}
+	BaseInvariant operator--(int num)
+	{
+		++*this;
+		return BaseInvariant(num);
+	}
 
 	// Stream
 	friend istream& operator>>(istream& inputStream, BaseInvariant& instance)
