@@ -36,11 +36,24 @@ class BaseInvariant
 		OPERATORS(long, operation)\
 		OPERATORS(double, operation)
 
+	#define MODULUS_OPERATOR(type)\
+		friend BaseInvariant operator%(const BaseInvariant& lhs, const type& rhs)\
+		{ return lhs.modulus<type>(rhs); }
+
 	#define MATH_ASSIGNMENT_OPERATOR(operation) BaseInvariant& operator##operation##=(const BaseInvariant& rhs) { return *this = *this operation rhs; }
 
 	#define COPY_CONSTRUCTOR(type)\
 		BaseInvariant(type value, const int base = STANDARD_BASE, const int precision = STANDARD_PRECISION)\
 		{ construct<type>(value, base, precision); }
+
+	template<typename T>
+	BaseInvariant modulus(T rhs) const
+	{
+		double doubleRhs = (double) rhs;
+		double doubleLhs = (double) *this;
+		int nearestMultiple = (int) (floor(doubleLhs / doubleRhs) * doubleRhs);
+		return BaseInvariant(doubleLhs - (double) nearestMultiple, m_base);
+	}
 
 	template<typename T>
 	T cast() const
@@ -144,7 +157,7 @@ public:
 	CONVERSION_OPERATOR(long)
 	CONVERSION_OPERATOR(double)
 
-	// Logical
+	// Comparison
 	bool operator==(const BaseInvariant& rhs) const
 	{
 		return m_data == rhs.m_data && m_base == rhs.m_base && m_isNegative == rhs.m_isNegative;
@@ -176,10 +189,16 @@ public:
 	MATH_OPERATORS(-)
 	MATH_OPERATORS(*)
 	MATH_OPERATORS(/)
+	MODULUS_OPERATOR(BaseInvariant)
+	MODULUS_OPERATOR(short)
+	MODULUS_OPERATOR(int)
+	MODULUS_OPERATOR(long)
+	MODULUS_OPERATOR(double)
 	MATH_ASSIGNMENT_OPERATOR(+)
 	MATH_ASSIGNMENT_OPERATOR(-)
 	MATH_ASSIGNMENT_OPERATOR(*)
 	MATH_ASSIGNMENT_OPERATOR(/)
+	MATH_ASSIGNMENT_OPERATOR(%)
 
 	// Stream
 	friend istream& operator>>(istream& inputStream, BaseInvariant& instance)
